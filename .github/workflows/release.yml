@@ -18,7 +18,7 @@ jobs:
         run: |
           mkdir -p dist/legacy-manual-support
           cp -r extension/. dist/legacy-manual-support/
-          cp README.md LICENSE NOTICE dist/legacy-manual-support/
+          cp README.md TERMS.md LICENSE NOTICE dist/legacy-manual-support/
           cd dist && zip -qr legacy-manual-support.zip legacy-manual-support
       - name: Release を作成
         env:

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "レガシー整備書サポート",
   "short_name": "整備書サポート",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "非公式。FAINESの古い整備書 (IE専用の閲覧画面・別PDFへリンクするPDF) をChromeで閲覧できるようにします。",
   "icons": {
     "16": "icons/16.png",
