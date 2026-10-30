@@ -17,9 +17,14 @@
   const fn = (obj, name, f) => def(obj, name, { value: f, writable: true });
 
   // ---- IEモード (ActiveXObject) を有効にするかの判定: 資料ごと (URLの先頭8階層) に記憶 ----
-  const rootKey = "fainesIE:" + location.pathname.split("/").slice(0, 9).join("/");
+  // 資料の区切り: ファイル名を除いたフォルダの先頭8階層 (浅い資料でもフレームごとに別扱いにならないように)
+  const rootDir = location.pathname.split("/").slice(0, -1).slice(0, 9).join("/");
+  const rootKey = "fainesIE:" + rootDir;
   const store = (() => { try { return window.localStorage; } catch { return null; } })();
   const ieMode = (() => { try { return store?.getItem(rootKey) === "1"; } catch { return false; } })();
+  // 「Internet Explorer で開いてください」と止める資料 (ブラウザ名・OSを確認するもの) は、IEのふりをする
+  const navKey = "fainesIEnav:" + rootDir;
+  const navMode = (() => { try { return store?.getItem(navKey) === "1"; } catch { return false; } })();
 
   // ======================= DOM 系 (常に追加して害のないもの) =======================
   // attachEvent / detachEvent / fireEvent
@@ -345,6 +350,47 @@
     log("IEモードで表示中", rootKey);
   }
 
+  if (navMode) {
+    const nav = { appName: "Microsoft Internet Explorer", appVersion: "4.0 (compatible; MSIE 6.0; Windows NT 5.1)", platform: "Win32" };
+    for (const [k, v] of Object.entries(nav)) try { Object.defineProperty(Navigator.prototype, k, { configurable: true, get: () => v }); } catch {}
+    log("IEのブラウザ名で表示中", navKey);
+  }
+  // IEでは id だけを付けた frame/iframe も window.<id> でフレームのウィンドウとして参照できる
+  function exposeFrame(el) {
+    const id = el.id;
+    if (!id || el.name === id || !(ieMode || navMode)) return;
+    try { if (window[id] !== el) return; } catch { return; }
+    try { Object.defineProperty(window, id, { configurable: true, get: () => el.contentWindow }); } catch {}
+  }
+  // 読み込み直し: 「直接開いたか (document.referrer が空か)」で初期化を分ける資料があるので、参照元を付けずに開き直す
+  function reloadClean() {
+    setTimeout(() => {
+      try {
+        const m = document.createElement("meta");
+        m.name = "referrer"; m.content = "no-referrer";
+        (document.head || document.documentElement).appendChild(m);
+      } catch {}
+      location.replace(location.href);
+    }, 0);
+  }
+  const ieAlert = /Internet Explorer|Microsoft Windows/i;
+  const origAlert = window.alert;
+  window.alert = function (msg) {
+    if (!navMode && ieAlert.test(String(msg))) {
+      try {
+        const k = "fainesIEnavreload:" + location.href;
+        if (!sessionStorage.getItem(k)) {
+          sessionStorage.setItem(k, "1");
+          store?.setItem(navKey, "1");
+          log("IE専用の確認で止まったページ → IEのブラウザ名で再読み込み");
+          reloadClean();
+          return;
+        }
+      } catch {}
+    }
+    return origAlert.apply(this, arguments);
+  };
+
   // ActiveXObject が無くて止まったら、この資料をIEモードにして読み込み直す (資料ごとに1回)
   const needsIE = (msg) => /ActiveXObject is not defined|ActiveXObject is not a constructor/.test(String(msg));
   window.addEventListener("error", (e) => {
@@ -384,6 +430,7 @@
     if (!root.querySelectorAll) return;
     for (const el of root.querySelectorAll("xml")) upgradeIsland(el);
     for (const el of root.querySelectorAll("embed[type],object[type]")) fixEmbed(el);
+    for (const el of root.querySelectorAll("frame[id],iframe[id]")) exposeFrame(el);
   }
   new MutationObserver((muts) => {
     for (const m of muts) for (const n of m.addedNodes) {
@@ -391,6 +438,7 @@
       const tn = n.localName;
       if (tn === "xml") upgradeIsland(n);
       else if (tn === "embed" || tn === "object") fixEmbed(n);
+      else if (tn === "frame" || tn === "iframe") exposeFrame(n);
       else if (n.firstElementChild) scan(n);
     }
   }).observe(document, { childList: true, subtree: true });

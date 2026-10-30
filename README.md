@@ -16,6 +16,7 @@
 | 「情報表示」を押しても何も出ない／白紙になる (日産ESMなど、Internet Explorer専用の閲覧画面) | IE専用の機能 (ActiveXのXML読み込み・Scripting.Dictionary・document.frames・attachEvent・selectNodes など) を Chrome 用に補います |
 | PDFの表紙しか見られない、しおり・目次から章へ飛べない (トヨタ旧PDF形式など、章ごとに別PDFへリンクしている資料) | FAINESのPDFを専用ビューアで開き、別PDFへのしおり・リンクを辿れるようにします (戻る/進む・文書内検索・しおり表示付き) |
 | 開いた直後に出るはずの別ウィンドウがポップアップブロックで出ない | 同じタブで開きます |
+| 「Internet Explorer で実行してください」と表示されて閉じる／一覧が空のまま | その資料だけ Internet Explorer として振る舞い、読み込み直します |
 
 ### 対応している資料の形式
 
@@ -23,6 +24,7 @@
 |---|---|
 | IE専用の閲覧画面 (ActiveX・XMLで目次を組み立てる旧形式の電子整備書) | 表示できることを確認 |
 | 章ごとに別PDFへリンクしているPDF形式の整備書 | しおり・リンクで別PDFへ移動できることを確認 |
+| 開くと「Internet Explorer で実行してください」と出て止まる旧形式 (ブラウザ名・OSを確認するもの) | IEとして振る舞い、選択画面・目次・本文まで表示できることを確認 |
 | Chrome でそのまま開ける新しい閲覧画面・PDF | 影響がないことを確認 |
 
 表示できない資料があった場合は、[報告](#表示できない資料の報告) をお願いします。
@@ -68,6 +70,7 @@ ZIPをダウンロードして、同じフォルダの中身を置き換えて�
 - `extension/background.js` … 設定に応じて、IE互換スクリプトの登録とPDF転送規則を切り替えます。
 - `extension/ie_compat.js` … IE互換レイヤー (ページ内で動作)。
   - `ActiveXObject` は、ページが「ActiveXObject is not defined」で止まったときだけ有効にします (資料ごとに記憶)。
+  - ブラウザ名 (Internet Explorer / Windows) は、ページが「Internet Explorer で実行してください」と警告したときだけ書き換えます (資料ごとに記憶)。
 - `extension/viewer/` … PDFビューア。[pdf.js](https://github.com/mozilla/pdf.js) 6.4 を同梱しています。
   - FAINES の整備書PDF (`/enduser/system/files/manual/….pdf`) をこのビューアへ転送します。
 - `extension/popup.*` … 設定メニュー。

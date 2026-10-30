@@ -18,7 +18,7 @@ document.getElementById("reset").onclick = async () => {
   if (!tab?.url?.startsWith("https://faines.jaspa.or.jp/")) { msg("FAINESのページを開いた状態で押してください。"); return; }
   await chrome.scripting.executeScript({
     target: { tabId: tab.id, allFrames: true },
-    func: () => { for (const k of Object.keys(localStorage)) if (k.startsWith("fainesIE:")) localStorage.removeItem(k); },
+    func: () => { for (const k of Object.keys(localStorage)) if (k.startsWith("fainesIE:") || k.startsWith("fainesIEnav:")) localStorage.removeItem(k); },
   });
   msg("リセットしました。");
 };
