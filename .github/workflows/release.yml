@@ -1,0 +1,26 @@
+# v1.2.3 のようなタグを push すると、拡張機能のZIPを作って Releases に公開する
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: タグと manifest.json のバージョンを照合
+        run: |
+          v=$(jq -r .version extension/manifest.json)
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "manifest.json の version ($v) とタグ ($GITHUB_REF_NAME) が違います"; exit 1; }
+      - name: ZIP を作成
+        run: |
+          mkdir -p dist/legacy-manual-support
+          cp -r extension/. dist/legacy-manual-support/
+          cp README.md LICENSE NOTICE dist/legacy-manual-support/
+          cd dist && zip -qr legacy-manual-support.zip legacy-manual-support
+      - name: Release を作成
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/legacy-manual-support.zip --title "$GITHUB_REF_NAME" --generate-notes

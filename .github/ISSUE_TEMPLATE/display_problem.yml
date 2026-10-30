@@ -1,0 +1,44 @@
+name: 表示できない資料の報告
+description: 拡張機能を入れても FAINES の資料が正しく表示されないとき
+title: "表示できない資料: "
+labels: [表示不具合]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        資料の画面写真や本文は FAINES の著作物なので貼らないでください (エラー表示の部分だけなら可)。
+        ログインID・会員番号など個人の情報も書かないでください。
+  - type: input
+    id: vehicle
+    attributes:
+      label: メーカー・車名・型式
+      placeholder: 例) メーカー 車名 型式
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 開いたページのURL
+      description: 拡張機能メニューの「表示されない資料を報告」から開くと自動で入ります
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 資料の種類
+      options: [修理書・整備要領書, 解説書, 配線図, サービス技術情報, その他, わからない]
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 症状
+      placeholder: 例) 「情報表示」を押すと白い画面のまま / しおりを押しても別の章へ移動しない
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: エラー表示 (任意)
+      description: F12 キー → 「Console」タブに赤字で出ている行を貼ってください
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: 拡張機能 / Chrome のバージョン
