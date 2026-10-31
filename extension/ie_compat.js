@@ -119,6 +119,9 @@
       log("ポップアップがブロックされたので同じタブで開きます:", url);
       const target = new URL(url, location.href).href;
       setTimeout(() => location.assign(target), 0);
+      // 続けて自分を閉じる (win.close()) と、同じタブで開いた画面ごと消えるので閉じさせない
+      // (FAINES の確認画面から開いたタブはスクリプトで開かれたものなので、実際に閉じてしまう)
+      window.close = function () { log("同じタブで開いたので、閉じる処理を止めました"); };
     }
     return window;
   };
