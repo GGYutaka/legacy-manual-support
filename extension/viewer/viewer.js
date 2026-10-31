@@ -202,7 +202,7 @@ async function load() {
     if (!res.ok || !head.includes("%PDF-")) {
       const login = /login|ログイン/i.test(head) || res.redirected;
       status(login ? "FAINESにログインしてから開き直してください。"
-        : `PDFを取得できませんでした (HTTP ${res.status})。\nFAINESのメンテナンス中 (22:00〜7:00) の可能性があります。`);
+        : `PDFを取得できませんでした (HTTP ${res.status})。\nFAINESのメンテナンス中の可能性があります。`);
       return;
     }
     data = buf;
@@ -216,6 +216,8 @@ async function load() {
       cMapUrl: ASSET("cmaps"), cMapPacked: true,
       standardFontDataUrl: ASSET("standard_fonts"), wasmUrl: ASSET("wasm"), iccUrl: ASSET("iccs"),
       enableXfa: true,
+      // 埋め込みの無い書体 (平成明朝 等) の「代わりの書体で表示」警告は表示に影響しないので記録しない
+      verbosity: pdfjsLib.VerbosityLevel.ERRORS,
     }).promise;
   } catch (e) {
     status(`PDFを開けませんでした: ${e.message}`);
@@ -228,7 +230,9 @@ async function load() {
   $("pageNumber").max = pdfDoc.numPages;
   const meta = await pdfDoc.getMetadata().catch(() => null);
   const title = meta?.info?.Title?.trim();
-  if (title) { document.title = title; $("docTitle").textContent = title; }
+  // 古いMac版Acrobatで作られたPDFは、日本語の題名が文字化けして記録されている (例 "ì\éÜÅièSñ Åj") ので使わない
+  const garbled = (t) => /[\u0080-ÿ]/.test(t) && !/[　-鿿＀-￯]/.test(t);
+  if (title && !garbled(title)) { document.title = title; $("docTitle").textContent = title; }
   const outline = await pdfDoc.getOutline();
   if (outline?.length) renderOutline(outline, $("outline"), 0);
   else {
