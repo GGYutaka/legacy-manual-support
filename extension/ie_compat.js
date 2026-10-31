@@ -391,6 +391,25 @@
     return origAlert.apply(this, arguments);
   };
 
+  // Netscape 4 用の画面 (document.layers) に振り分けられて止まったら、IEのブラウザ名で振り分け元から開き直す
+  // (三菱の目次 left1.html → left1NC.html など。Chrome は appName が Netscape のため。資料ごとに1回)
+  let usedLayers = false;
+  if (!navMode && !("layers" in document)) {
+    try { Object.defineProperty(Document.prototype, "layers", { configurable: true, get() { usedLayers = true; return undefined; } }); } catch {}
+  }
+  window.addEventListener("error", () => {
+    if (navMode || !usedLayers) return;
+    try {
+      const k = "fainesIEnavreload:" + location.href;
+      if (sessionStorage.getItem(k)) return;
+      sessionStorage.setItem(k, "1");
+      store?.setItem(navKey, "1");
+    } catch { return; }
+    const ref = document.referrer;
+    log("Netscape 4 用の画面で止まったページ → IEのブラウザ名で開き直す");
+    setTimeout(() => location.replace(ref && new URL(ref).origin === location.origin ? ref : location.href), 0);
+  }, true);
+
   // ActiveXObject が無くて止まったら、この資料をIEモードにして読み込み直す (資料ごとに1回)
   const needsIE = (msg) => /ActiveXObject is not defined|ActiveXObject is not a constructor/.test(String(msg));
   window.addEventListener("error", (e) => {
