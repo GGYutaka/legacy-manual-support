@@ -352,6 +352,8 @@
 
   if (navMode) {
     const nav = { appName: "Microsoft Internet Explorer", appVersion: "4.0 (compatible; MSIE 6.0; Windows NT 5.1)", platform: "Win32" };
+    // Mac 等: userAgent に "Win" が無いと弾く資料があるので、OS 部分だけ Windows にする
+    if (!/Win/.test(navigator.userAgent)) nav.userAgent = navigator.userAgent.replace(/\([^)]*\)/, "(Windows NT 10.0; Win64; x64)");
     for (const [k, v] of Object.entries(nav)) try { Object.defineProperty(Navigator.prototype, k, { configurable: true, get: () => v }); } catch {}
     log("IEのブラウザ名で表示中", navKey);
   }
@@ -409,6 +411,24 @@
     log("Netscape 4 用の画面で止まったページ → IEのブラウザ名で開き直す");
     setTimeout(() => location.replace(ref && new URL(ref).origin === location.origin ? ref : location.href), 0);
   }, true);
+
+  // 「お使いのマシンでは、本システムはご利用になれません」(Windows 以外を弾く画面) に移されたら、
+  // Windows・IEのふりをして、振り分けた画面ごと (親フレーム) 読み込み直す (三菱の旧形式など。資料ごとに1回)
+  document.addEventListener("DOMContentLoaded", () => {
+    if (navMode) return;
+    const text = (document.body?.innerText || "").trim();
+    if (text.length > 300 || !/お使いの(マシン|パソコン|コンピュータ|環境|OS)では.{0,20}(ご利用|ご使用|利用|使用)(に|が)?(なれ|でき)ません/.test(text)) return;
+    try {
+      const k = "fainesIEnavreload:" + location.href;
+      if (sessionStorage.getItem(k)) return;
+      sessionStorage.setItem(k, "1");
+      store?.setItem(navKey, "1");
+    } catch { return; }
+    log("Windows 以外を弾く画面 → Windows・IEのふりをして読み込み直す");
+    let w = window;
+    try { if (parent !== window && parent.location.origin === location.origin) w = parent; } catch {}
+    setTimeout(() => w.location.reload(), 0);
+  });
 
   // ActiveXObject が無くて止まったら、この資料をIEモードにして読み込み直す (資料ごとに1回)
   const needsIE = (msg) => /ActiveXObject is not defined|ActiveXObject is not a constructor/.test(String(msg));
