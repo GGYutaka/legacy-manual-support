@@ -20,7 +20,11 @@ jobs:
           cp -r extension/. dist/legacy-manual-support/
           cp README.md TERMS.md LICENSE NOTICE dist/legacy-manual-support/
           cd dist && zip -qr legacy-manual-support.zip legacy-manual-support
+      - name: ストア提出用 ZIP を作成 (manifest.json が ZIP の直下)
+        run: |
+          cp LICENSE NOTICE extension/
+          cd extension && zip -qr ../dist/legacy-manual-support-store.zip .
       - name: Release を作成
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/legacy-manual-support.zip --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/legacy-manual-support.zip dist/legacy-manual-support-store.zip --title "$GITHUB_REF_NAME" --generate-notes

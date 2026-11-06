@@ -24,6 +24,7 @@ document.getElementById("reset").onclick = async () => {
 };
 
 // 配布元 (GitHub) の最新リリースを確認し、新しい版があれば案内する
+// ストアから入れた場合 (manifest に update_url が付く) は Chrome が自動で更新するので案内しない
 const REPO = "GGYutaka/legacy-manual-support";
 const current = chrome.runtime.getManifest().version;
 document.getElementById("ver").textContent = `バージョン ${current}`;
@@ -32,7 +33,7 @@ const newer = (a, b) => {
   for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
   return false;
 };
-fetch(`https://api.github.com/repos/${REPO}/releases/latest`).then((r) => r.ok ? r.json() : null).then((rel) => {
+if (!chrome.runtime.getManifest().update_url) fetch(`https://api.github.com/repos/${REPO}/releases/latest`).then((r) => r.ok ? r.json() : null).then((rel) => {
   const latest = rel?.tag_name?.replace(/^v/, "");
   if (!latest || !newer(latest, current)) return;
   document.getElementById("latest").textContent = latest;
