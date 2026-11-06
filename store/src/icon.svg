@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <mask id="m">
+      <rect width="128" height="128" fill="#fff"/>
+      <!-- 口 (開いた側) -->
+      <g transform="translate(86 42) rotate(-45)"><rect x="-3" y="-9" width="40" height="18" rx="2" fill="#000"/></g>
+      <!-- 柄の先の穴 -->
+      <circle cx="35" cy="93" r="6" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#c71444"/>
+  <g fill="#fff" mask="url(#m)">
+    <circle cx="86" cy="42" r="24"/>
+    <line x1="35" y1="93" x2="86" y2="42" stroke="#fff" stroke-width="18"/>
+    <circle cx="35" cy="93" r="14"/>
+  </g>
+</svg>

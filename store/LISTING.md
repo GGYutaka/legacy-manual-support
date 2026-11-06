@@ -44,8 +44,13 @@ https://github.com/GGYutaka/legacy-manual-support
 ### 画像
 
 - ショップアイコン 128×128: `store/icon-128.png` (ストアの指定どおり、絵柄 96×96 の周りに透明な余白 16px)
-- スクリーンショット 1280×800 (1〜5枚): 資料の本文が写らないものにする (FAINES・メーカーの著作物のため)。
-  拡張機能メニュー、しおりのみのビューア画面 などを使う。
+- スクリーンショット 1280×800: `store/screenshots/` の4枚を番号順にアップロード。
+  資料の本文は FAINES・メーカーの著作物なので写さず、ビューアの画面は自作の架空のサンプルPDFで撮影している。
+  - `screenshot_1_title.png`: 名前と3つの機能
+  - `screenshot_2_viewer.png`: 別PDFへのしおり・リンク
+  - `screenshot_3_chapter.png`: 章のPDFとしおりの現在位置
+  - `screenshot_4_menu.png`: 拡張機能のメニュー
+- アイコンの元データ: `store/src/icon.svg` (スパナの絵柄)
 
 ## プライバシーへの取り組み (Privacy practices)
 
