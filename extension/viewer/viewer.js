@@ -1,6 +1,7 @@
 // FAINES PDF ビューア (pdf.js)
 // Chrome標準のPDF表示は /Launch・/GoToR (別PDFへのしおり・リンク) を無視するため、トヨタ旧PDF形式などの
 // 「表紙 → 目次 → 章ごとのPDF」が辿れない。ここでは別PDFへのリンクを同じビューアで開き直して辿れるようにする。
+import "./compat.js";
 import * as pdfjsLib from "./pdfjs/build/pdf.min.mjs";
 
 globalThis.pdfjsLib = pdfjsLib;
@@ -113,6 +114,36 @@ $("btnSidebar").onclick = () => {
   try { localStorage.setItem("fainesSidebar", document.body.classList.contains("no-sidebar") ? "0" : "1"); } catch {}
 };
 try { if (localStorage.getItem("fainesSidebar") === "0") document.body.classList.add("no-sidebar"); } catch {}
+
+// ---- 画面の狭いとき (スマートフォン・タブレット)・埋め込み表示 ----
+if (/LegacyManualApp\//.test(navigator.userAgent)) document.body.classList.add("in-app");
+const narrow = matchMedia("(max-width: 760px)");
+// 狭い画面では、しおりは本文に重ねて開くので、最初は閉じておき、項目を選んだら閉じる
+if (narrow.matches) document.body.classList.add("no-sidebar");
+const closeSidebarIfNarrow = () => { if (narrow.matches) document.body.classList.add("no-sidebar"); };
+container.addEventListener("pointerdown", closeSidebarIfNarrow);
+// 指2本で拡大縮小 (ページ全体ではなく PDF だけを拡大する。指の間の位置を中心に)
+{
+  let pinch = null, pending = 0, raf = 0;
+  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const mid = (t) => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+  const apply = () => {
+    raf = 0;
+    const f = pending / pdfViewer.currentScale;
+    if (Math.abs(f - 1) > 0.01) pdfViewer.updateScale({ scaleFactor: f, origin: pinch.c, drawingDelay: 300 });
+  };
+  container.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) pinch = { d: dist(e.touches), s: pdfViewer.currentScale, c: mid(e.touches) };
+  }, { passive: true });
+  container.addEventListener("touchmove", (e) => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    pinch.c = mid(e.touches);
+    pending = Math.min(8, Math.max(0.25, pinch.s * dist(e.touches) / pinch.d));
+    if (!raf) raf = requestAnimationFrame(apply);
+  }, { passive: false });
+  container.addEventListener("touchend", (e) => { if (e.touches.length < 2) pinch = null; });
+}
 $("btnBack").onclick = () => history.back();
 $("btnForward").onclick = () => history.forward();
 $("btnRaw").onclick = () => { if (fileUrl) location.href = rawUrl(fileUrl); };
@@ -122,6 +153,10 @@ function find(again, previous = false) {
   eventBus.dispatch("find", { source: null, type: again ? "again" : "", query, caseSensitive: false,
     entireWord: false, highlightAll: true, findPrevious: previous, matchDiacritics: false });
 }
+$("btnFind").onclick = () => {
+  const on = document.body.classList.toggle("finding");
+  if (on) $("findInput").focus();
+};
 $("findInput").addEventListener("input", () => find(false));
 $("findInput").addEventListener("keydown", (e) => { if (e.key === "Enter") find(true, e.shiftKey); });
 eventBus.on("updatefindmatchescount", ({ matchesCount }) => {
@@ -166,7 +201,7 @@ function renderOutline(items, parent, depth) {
     }
     const url = it.url || it.unsafeUrl;
     if (it.dest) {
-      a.onclick = () => linkService.goToDestination(it.dest);
+      a.onclick = () => { linkService.goToDestination(it.dest); closeSidebarIfNarrow(); };
       pageOfDest(it.dest).then((p) => p && outlineEntries.push({ el: a, page: p }));
     } else if (url) {
       a.classList.add("ext");
@@ -196,7 +231,9 @@ async function load() {
   status("読み込み中…");
   let data;
   try {
-    const res = await fetch(fileUrl, { credentials: "include" });
+    // FAINES と別の場所 (lmsapp:) で開かれたときは、PDF を呼び出し元経由でログイン状態のまま取得する
+    const src = location.protocol === "lmsapp:" ? `lmsapp://app/fetch?url=${encodeURIComponent(fileUrl)}` : fileUrl;
+    const res = await fetch(src, { credentials: "include" });
     const buf = new Uint8Array(await res.arrayBuffer());
     const head = new TextDecoder().decode(buf.slice(0, 1024));
     if (!res.ok || !head.includes("%PDF-")) {

@@ -10,6 +10,7 @@ body { display: flex; flex-direction: column; background: var(--bg); }
 #toolbar button:disabled { opacity: .4; }
 #pageNumber { width: 64px; text-align: right; }
 #findInput { width: 180px; }
+#btnFind { display: none; }
 #findMsg { min-width: 4em; color: #bdc1c6; }
 #docTitle { flex: 1; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #bdc1c6; padding: 0 8px; }
 .sep { width: 1px; height: 20px; background: #5f6368; margin: 0 4px; }
@@ -35,3 +36,22 @@ body.no-sidebar #viewerContainer { left: 0; }
 #status:empty { display: none; }
 #status a { color: #8ab4f8; }
 .annotationLayer .linkAnnotation > a:hover { background: rgba(255, 210, 0, .25); }
+
+/* 埋め込み表示 (in-app) では Chrome 標準表示が使えないので出さない */
+body.in-app #btnRaw { display: none; }
+body.in-app #toolbar button, body.in-app #toolbar select, body.in-app #toolbar input { height: 36px; min-width: 36px; font-size: 15px; }
+/* 画面の狭いスマートフォン: しおりは本文の上に重ねて開く。ツールバーは必要なものだけ */
+@media (max-width: 760px) {
+  #toolbar { gap: 3px; padding: 4px; }
+  #toolbar .sep, #docTitle, #findMsg:empty, #btnForward, #btnZoomOut, #btnZoomIn { display: none; }
+  #pageNumber { width: 48px; }
+  #btnFind { display: inline-block; }
+  #findInput, #findMsg { display: none; }
+  body.finding #findInput { display: block; order: 10; flex: 1 0 100%; }
+  body.finding #findMsg { display: inline; order: 11; }
+  #scaleSelect { max-width: 7.5em; }
+  #sidebar { width: min(85vw, 360px); z-index: 5; box-shadow: 2px 0 12px rgba(0,0,0,.35); font-size: 15px; }
+  #outline a { padding: 6px 4px; }
+  #outline .toggle { width: 24px; padding-top: 6px; }
+  #viewerContainer { left: 0; }
+}

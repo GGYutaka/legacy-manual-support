@@ -438,7 +438,8 @@
   });
 
   // ActiveXObject が無くて止まったら、この資料をIEモードにして読み込み直す (資料ごとに1回)
-  const needsIE = (msg) => /ActiveXObject is not defined|ActiveXObject is not a constructor/.test(String(msg));
+  // Chrome は "ActiveXObject is not defined"、Safari は "Can't find variable: ActiveXObject"
+  const needsIE = (msg) => /ActiveXObject is not defined|ActiveXObject is not a constructor|Can't find variable: ActiveXObject/.test(String(msg));
   window.addEventListener("error", (e) => {
     if (ieMode || !needsIE(e.message || e.error)) return;
     try {
