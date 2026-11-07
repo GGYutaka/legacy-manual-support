@@ -23,23 +23,10 @@ document.getElementById("reset").onclick = async () => {
   msg("リセットしました。");
 };
 
-// 配布元 (GitHub) の最新リリースを確認し、新しい版があれば案内する
-// ストアから入れた場合 (manifest に update_url が付く) は Chrome が自動で更新するので案内しない
-const REPO = "GGYutaka/legacy-manual-support";
+// 利用規約・報告の受付 (コードは置いていない公開リポジトリ)。更新はストアから自動で行われる
+const INFO_REPO = "GGYutaka/legacy-manual-support-info";
 const current = chrome.runtime.getManifest().version;
 document.getElementById("ver").textContent = `バージョン ${current}`;
-const newer = (a, b) => {
-  const x = a.split(".").map(Number), y = b.split(".").map(Number);
-  for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
-  return false;
-};
-if (!chrome.runtime.getManifest().update_url) fetch(`https://api.github.com/repos/${REPO}/releases/latest`).then((r) => r.ok ? r.json() : null).then((rel) => {
-  const latest = rel?.tag_name?.replace(/^v/, "");
-  if (!latest || !newer(latest, current)) return;
-  document.getElementById("latest").textContent = latest;
-  document.getElementById("updateLink").href = rel.html_url;
-  document.getElementById("update").hidden = false;
-}).catch(() => {});
 
 // 表示できない資料の報告: 開いているFAINESページの場所を入れた Issue フォームを開く (送信前に本人が内容を確認できる)
 document.getElementById("report").onclick = async () => {
@@ -47,5 +34,5 @@ document.getElementById("report").onclick = async () => {
   const url = tab?.url?.startsWith("https://faines.jaspa.or.jp/") ? tab.url.replace(/[?#].*$/, "") : "";
   const q = new URLSearchParams({ template: "display_problem.yml", title: "表示できない資料: ", url,
                                   version: `${current} / ${navigator.userAgent.match(/Chrome\/[\d.]+/)?.[0] || ""}` });
-  chrome.tabs.create({ url: `https://github.com/${REPO}/issues/new?${q}` });
+  chrome.tabs.create({ url: `https://github.com/${INFO_REPO}/issues/new?${q}` });
 };

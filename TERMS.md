@@ -30,5 +30,5 @@ FAINES 側の仕様変更などにより、本ソフトウェアが使えなく�
 
 ## 6. ライセンス
 
-本ソフトウェアのソースコードは MIT License (`LICENSE`) で提供します。同梱の pdf.js は Apache License 2.0 です (`NOTICE`)。
+本ソフトウェアは MIT License で提供します (本ソフトウェアに同梱の `LICENSE`)。同梱の pdf.js は Apache License 2.0 です (`NOTICE`)。
 この規約と各ライセンスの免責条項はあわせて適用されます。

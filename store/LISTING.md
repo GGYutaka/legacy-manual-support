@@ -37,8 +37,8 @@ FAINES (整備情報提供システム) の古い整備書のうち、Internet E
 ・FAINES の会員として、FAINES の利用規約に従ってご利用ください。資料の保存・複製を行う機能はありません。
 ・VBScript や専用プラグイン (CAD ビューア等) が必要な画面には対応できません。
 
-■ ソースコード・利用規約・不具合の報告
-https://github.com/GGYutaka/legacy-manual-support
+■ 利用規約・プライバシーポリシー・不具合の報告
+https://github.com/GGYutaka/legacy-manual-support-info
 ```
 
 ### 画像
@@ -76,7 +76,7 @@ IE 専用の閲覧画面を動かすための互換処理と、別の PDF への
 - 収集するデータ: **なし** (どの項目にもチェックを入れない)
 - 3つの同意項目 (第三者に販売しない／単一用途と無関係な目的に使わない／信用力の判断に使わない) にチェック
 - プライバシーポリシーの URL:
-  https://github.com/GGYutaka/legacy-manual-support/blob/main/PRIVACY.md
+  https://github.com/GGYutaka/legacy-manual-support-info/blob/main/PRIVACY.md
 
 ## 配布
 

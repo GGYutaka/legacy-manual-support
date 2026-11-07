@@ -1,5 +1,7 @@
 # レガシー整備書サポート (Legacy Manual Support)
 
+> このリポジトリは非公開です。使う人向けの説明・利用規約・プライバシーポリシー・報告の受付は、公開リポジトリ [legacy-manual-support-info](https://github.com/GGYutaka/legacy-manual-support-info) に置いています (内容を変えたら両方を揃える)。
+
 [FAINES](https://faines.jaspa.or.jp/) に掲載されている古い整備書を、Chrome でそのまま閲覧できるようにする非公式の拡張機能です。
 
 > **非公式ツールです。** 一般社団法人 日本自動車整備振興会連合会 (JASPA)・FAINES とは関係ありません。
@@ -34,18 +36,14 @@
 
 ## インストール
 
-1. [Releases](../../releases/latest) から `legacy-manual-support.zip` をダウンロードして展開し、
-   出てきた `legacy-manual-support` フォルダを分かりやすい場所に置きます (例: `ドキュメント`)。
-   ※ 後でフォルダを動かしたり消したりすると、拡張機能も使えなくなります。
-2. Chrome のアドレス欄に `chrome://extensions` と入力して開きます。
-3. 右上の「デベロッパー モード」をオンにします。
-4. 「パッケージ化されていない拡張機能を読み込む」を押し、手順1のフォルダ (`manifest.json` が入っているフォルダ) を選びます。
-5. ツールバーのパズルのアイコンから「レガシー整備書サポート」をピン留めしておくと、設定を切り替えやすくなります。
+使う人には Chrome ウェブストア (限定公開) から入れてもらう。手順は legacy-manual-support-info の README に書いてある。
+ストアには Releases の `legacy-manual-support-store.zip` (manifest.json が ZIP の直下) をアップロードする (`store/LISTING.md`)。
 
-### 更新
+開発・確認用に ZIP から入れる場合:
 
-新しい版が出ると、拡張機能のメニューに「新しい版 x.y.z があります」と表示されます。
-ZIPをダウンロードして、同じフォルダの中身を置き換えてから、`chrome://extensions` で拡張機能の「再読み込み」(↻) を押してください。設定はそのまま残ります。
+1. Releases から `legacy-manual-support.zip` をダウンロードして展開する。
+2. `chrome://extensions` で「デベロッパー モード」をオンにし、「パッケージ化されていない拡張機能を読み込む」で展開したフォルダ (`manifest.json` が入っているフォルダ) を選ぶ。
+3. 更新するときは、フォルダの中身を置き換えて「再読み込み」(↻) を押す。ストア版と両方入れると同じ処理が二重に動くので、どちらか一方にする。
 
 ## 使い方
 
