@@ -18,7 +18,11 @@
 
   // ---- IEモード (ActiveXObject) を有効にするかの判定: 資料ごと (URLの先頭8階層) に記憶 ----
   // 資料の区切り: ファイル名を除いたフォルダの先頭8階層 (浅い資料でもフレームごとに別扱いにならないように)
-  const rootDir = location.pathname.split("/").slice(0, -1).slice(0, 9).join("/");
+  // 日産の電子配線図 (…/eWD/) は同じフォルダの整備書 (ESM) と別に判定する。Chrome でそのまま動くが、
+  // ActiveXObject があると IE 用の処理 (msxml) に切り替わって「undefined」になるため
+  const dirs = location.pathname.split("/").slice(0, -1);
+  const ewd = dirs.findIndex((d) => /^ewd$/i.test(d));
+  const rootDir = (ewd > 0 ? dirs.slice(0, ewd + 1) : dirs.slice(0, 9)).join("/");
   const rootKey = "fainesIE:" + rootDir;
   const store = (() => { try { return window.localStorage; } catch { return null; } })();
   const ieMode = (() => { try { return store?.getItem(rootKey) === "1"; } catch { return false; } })();
